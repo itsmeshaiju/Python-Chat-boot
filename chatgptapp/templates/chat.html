@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatbot</title>
+</head>
+<body>
+    <h1>Chat with the Bot</h1>
+    <div id="chat-history">
+        <!-- Display chat history here -->
+    </div>
+    <form id="chat-form" action="/chat/" method="post">
+        {% csrf_token %}
+        <input type="text" id="user-message" placeholder="Type your message..."  name="user_message"/>
+        <button type="submit">Send</button>
+    </form>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#chat-form').submit(function(e) {
+                e.preventDefault();
+                var userMessage = $('#user-message').val();
+
+                // Display user message in chat history
+                $('#chat-history').append('<p>User: ' + userMessage + '</p>');
+
+                // Make an AJAX request to the Django view to get the bot's response
+                $.ajax({
+                    url: '/chat/',
+                    method: 'POST',
+                    data: { 'user_message': userMessage },
+                    success: function(data) {
+                        var botResponse = data.bot_response;
+                        // Display bot response in chat history
+                        $('#chat-history').append('<p>Bot: ' + botResponse + '</p>');
+                        // Clear the input field
+                        $('#user-message').val('');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
