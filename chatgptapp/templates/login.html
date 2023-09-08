@@ -1,0 +1,124 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Login</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+    <link rel="stylesheet" href="{% static 'css/loginstyle.css' %}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+  </head>
+  <body>
+    <section class="mt-3">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-md-6 text-center mb-4">
+            {% comment %} <h6 class="heading-section">Login</h6> {% endcomment %}
+          </div>
+        </div>
+        <div class="row justify-content-center">
+          <div class="col-md-6 col-lg-5">
+            <div class="login-wrap p-4 p-md-5">
+
+                {% if messages %}
+            <div class="messages">
+            {% for message in messages %}
+            <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+            </div>
+            {% endif %}
+
+
+              <div class="icon d-flex align-items-center justify-content-center">
+                <span class="fa fa-user-o"></span>
+              </div>
+              <h3 class="text-center mb-4">Login</h3>
+              <form method="POST" class="login-form">
+                {% csrf_token %} <!-- Include this for security -->
+                <div class="form-group">
+                  <input type="text" class="form-control rounded-left" name="username" placeholder="Username" required>
+                </div>
+                <div class="form-group d-flex">
+                  <input type="password" class="form-control rounded-left" name="password" placeholder="Password" required>
+                </div>
+                <div class="form-group d-md-flex">
+                  <div class="w-50">
+                    <label class="checkbox-wrap checkbox-primary">Remember Me
+                      <input type="checkbox" checked>
+                      <span class="checkmark"></span>
+                    </label>
+                  </div>
+                  <div class="w-50 text-md-right">
+                    <a href="#">Forgot Password</a>
+                  </div>
+                </div>
+                <div class="signup-link">
+                  Not a member? <a href="/signup">Signup now</a>
+               </div>
+                <div class="form-group">
+                  <button type="submit" class="btn btn-primary rounded submit p-3 px-5">Sign in</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/popper.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    <script>
+      $(document).ready(function () {
+          $('form.login-form').submit(function (e) {
+              // Prevent the form from submitting initially
+              e.preventDefault();
+  
+              // Get the values from the username and password fields
+              var username = $('input[name="username"]').val();
+              var password = $('input[name="password"]').val();
+  
+              // Initialize a variable to track if there are validation errors
+              var hasErrors = false;
+  
+              // Validation checks
+              if (username.trim() === '') {
+                  alert('Username cannot be empty.');
+                  hasErrors = true;
+              }
+  
+              if (password.trim() === '') {
+                  alert('Password cannot be empty.');
+                  hasErrors = true;
+              }
+  
+              // If there are validation errors, do not submit the form
+              if (hasErrors) {
+                  return;
+              }
+  
+              // If all validations pass, you can submit the form
+              // Here, I'm enabling the form submission, but you may want to replace this with AJAX if needed
+              this.submit();
+          });
+      });
+  </script>
+  <script>
+    setTimeout(function() {
+        $('.messages').fadeOut('slow');
+    }, 5000);
+  </script>
+  
+
+  </body>
+</html>

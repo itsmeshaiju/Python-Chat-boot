@@ -1,12 +1,15 @@
-from django.shortcuts import render
-import subprocess
-from django.http import HttpResponse
+import json
+from django.shortcuts import redirect, render
+from django.http import HttpResponse,HttpResponseRedirect
 import openai
-import pymysql
 import configparser
 import pandas
 from django.http import JsonResponse
 from .models import *
+from django.contrib import messages
+from django.core.paginator import Paginator
+from django.template import loader
+from chatgpt.utils import render_to_pdf
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -14,82 +17,99 @@ config.read('config.ini')
 
 # Create your views here.
 
-def index(request):
-    return render(request,'index.html')
-def list(request):
-    queryset=Tbl_QuestionAnswer.objects.all()
-    return render(request,'list.html',{'queryset':queryset})
-
-
-
-
-
-
 def generate_content(request):
     if request.method == 'POST':
-        # Get the user's question from the form
-        question = request.POST.get('question')
-
-        # Send the question to ChatGPT for an answer
         try:
-            # Configure ChatGPT API key
-            # openai.api_key = config['SETTINGS']['API_KEY']
-            openai.api_key = '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'
+            question = request.POST.get('question')
 
-            # Generate an answer from ChatGPT
+            # Generate an answer from ChatGPT (you can keep this part)
+            api_key = "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"  # Replace with your actual API key
+            openai.api_key = api_key
             answer_response = openai.Completion.create(
-                model="text-davinci-002",
+                model="text-davinci-003",
                 prompt=question,
-                max_tokens=50,  # Adjust the response length as needed
-                temperature=0.7,  # Adjust creativity if necessary
+                max_tokens=2000,
+                temperature=0.7,
             )
             answer = answer_response["choices"][0]["text"].strip()
-            print("__________",answer)
-            print("__________",question)
 
             # Store the question and answer in the database
-            Tbl_QuestionAnswer(question=question,answer=answer).save()
+            user_id = request.session.get('id')
+            user = Tbl_User.objects.get(id=user_id)
+            question_answer = Tbl_QuestionAnswer(question=question, answer=answer, user=user)
+            question_answer.save()
 
-            return HttpResponse(f"Question: {question}<br>Answer: {answer}")
-            # return HttpResponseRedirect('/')
         except Exception as e:
-            return HttpResponse(f"An error occurred: {str(e)}")
+            return render(request, 'index.html', {'error_message': str(e)})
 
-    return render(request, 'index.html')
+    # Retrieve questions and answers for the current user
+    user_id = request.session.get('id')
+    question_answers = Tbl_QuestionAnswer.objects.filter(user__id=user_id)
+    question_list = Tbl_QuestionAnswer.objects.filter(user_id=user_id).order_by('-timestamp')
+    paginator = Paginator(question_list, 8)
+    page_number = request.GET.get("page")
+    question_list = paginator.get_page(page_number)
+    user_data = request.session.get('id')
+    user = Tbl_User.objects.filter(id=user_data)
+    return render(request, 'index.html', {'question_answers': question_answers, 'question_list':question_list, 'user':user,'user_id':user_id})
 
+def signup(request):
+    if request.method == "POST":
+        email = request.POST.get('email')
+        username = request.POST.get('username')
+        password = request.POST.get('password')
 
+        if Tbl_User.objects.filter(email=email).exists():
+            messages.error(request, 'Email already exists...')
+            return redirect('signup')
 
+        user = Tbl_User(email=email, username=username, password=password)
+        user.save()
+        messages.success(request, 'Success! Signup Completed...')
+        return redirect('login')
 
+    return render(request, 'signup.html')
 
+def login(request):
+    if request.method == "POST":
+        username = request.POST.get('username')
+        password = request.POST.get('password')
 
-
-
-
-def chat_view(request):
-      if request.method == 'POST':
-        question = request.POST.get('user_message')
         try:
-            openai.api_key = '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'
-            # Generate an answer from ChatGPT
-            bot_response = openai.Completion.create(
-                model="text-davinci-002",
-                prompt=question,
-                max_tokens=50,  # Adjust the response length as needed
-                temperature=0.7,  # Adjust creativity if necessary
-            )
-            bot_response_text = bot_response["choices"][0]["text"].strip()
-            print("__________",bot_response_text)
-            print("__________",question)
+            user = Tbl_User.objects.get(username=username, password=password)
+        except Tbl_User.DoesNotExist:
+            user = None
 
-            # Store the question and answer in the database
-            # Tbl_QuestionAnswer(question=question,answer=bot_response_text).save()
-            chat_log = ChatLog(user_message=question, bot_response=bot_response_text)
-            chat_log.save()
+        if user is not None:
+            request.session['id'] = user.id
+            # messages.success(request, 'Login Successfully...')
+            return redirect('generate_content')
+        else:
+            messages.error(request, 'Invalid Credentials...')
+            return redirect('login')
 
-            # return HttpResponse(f"Question: {question}<br>Answer: {bot_response_text}")
-            return JsonResponse({'bot_response': bot_response_text})
+    return render(request, 'login.html')
 
-        except Exception as e:
-            return HttpResponse(f"An error occurred: {str(e)}")
 
-      return render(request, 'chat.html')
+def logout(request):
+    if request.session.has_key('id'):
+        del request.session['id']
+        logout(request)
+    return HttpResponseRedirect('/')
+
+def download_as_pdf(request):
+    user_id = request.GET['id']
+    var = Tbl_QuestionAnswer.objects.all().filter(user=user_id)
+    user = Tbl_User.objects.filter(id=user_id).first()  # Get the user object
+    if user:
+        # Create a filename with the username
+        filename = f"{user.username}.pdf"
+        pdf = render_to_pdf('pdf.html', {'var': var, 'user': user})
+        
+        # Set the Content-Disposition header with the dynamic filename
+        response = HttpResponse(pdf, content_type="application/pdf")
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+    else:
+        # Handle the case when the user with the given ID is not found
+        return HttpResponse("User not found", status=404)
