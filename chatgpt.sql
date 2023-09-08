@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 03, 2023 at 05:34 PM
+-- Generation Time: Sep 05, 2023 at 06:22 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.0.28
 
@@ -86,14 +86,14 @@ INSERT INTO `auth_permission` (`id`, `name`, `content_type_id`, `codename`) VALU
 (22, 'Can change session', 6, 'change_session'),
 (23, 'Can delete session', 6, 'delete_session'),
 (24, 'Can view session', 6, 'view_session'),
-(25, 'Can add tbl_ question answer', 7, 'add_tbl_questionanswer'),
-(26, 'Can change tbl_ question answer', 7, 'change_tbl_questionanswer'),
-(27, 'Can delete tbl_ question answer', 7, 'delete_tbl_questionanswer'),
-(28, 'Can view tbl_ question answer', 7, 'view_tbl_questionanswer'),
-(29, 'Can add chat log', 8, 'add_chatlog'),
-(30, 'Can change chat log', 8, 'change_chatlog'),
-(31, 'Can delete chat log', 8, 'delete_chatlog'),
-(32, 'Can view chat log', 8, 'view_chatlog');
+(25, 'Can add tbl_ user', 7, 'add_tbl_user'),
+(26, 'Can change tbl_ user', 7, 'change_tbl_user'),
+(27, 'Can delete tbl_ user', 7, 'delete_tbl_user'),
+(28, 'Can view tbl_ user', 7, 'view_tbl_user'),
+(29, 'Can add tbl_ question answer', 8, 'add_tbl_questionanswer'),
+(30, 'Can change tbl_ question answer', 8, 'change_tbl_questionanswer'),
+(31, 'Can delete tbl_ question answer', 8, 'delete_tbl_questionanswer'),
+(32, 'Can view tbl_ question answer', 8, 'view_tbl_questionanswer');
 
 -- --------------------------------------------------------
 
@@ -142,19 +142,6 @@ CREATE TABLE `auth_user_user_permissions` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `chatgptapp_chatlog`
---
-
-CREATE TABLE `chatgptapp_chatlog` (
-  `id` bigint(20) NOT NULL,
-  `user_message` longtext NOT NULL,
-  `bot_response` longtext NOT NULL,
-  `timestamp` datetime(6) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `chatgptapp_tbl_questionanswer`
 --
 
@@ -162,20 +149,44 @@ CREATE TABLE `chatgptapp_tbl_questionanswer` (
   `id` bigint(20) NOT NULL,
   `question` varchar(100) NOT NULL,
   `answer` varchar(800) NOT NULL,
-  `status` varchar(100) NOT NULL
+  `status` varchar(100) NOT NULL,
+  `user_id` bigint(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `chatgptapp_tbl_questionanswer`
 --
 
-INSERT INTO `chatgptapp_tbl_questionanswer` (`id`, `question`, `answer`, `status`) VALUES
-(1, 'what is coding', 'Coding is the process of transforming computer instructions into a form a computer can understand. P', ''),
-(2, 'what is PHP', '?\n\nPHP is a programming language that can be used to create dynamic web pages.', ''),
-(3, 'what is programming', 'Programming is the process of designing, writing, testing, and maintaining the source code of softwa', ''),
-(4, 'what is coding', '?\n\nCoding is the process of transforming computer instructions into a form a computer can understand', ''),
-(5, 'pyth', 'ia8_13TeV_lowMassDY_fwd.root\",', ''),
-(6, 'what is flutter', 'Flutter is a mobile app SDK for building high-performance, high-fidelity apps for iOS and Android. T', '');
+INSERT INTO `chatgptapp_tbl_questionanswer` (`id`, `question`, `answer`, `status`, `user_id`) VALUES
+(1, 'what is python', 'Python is a programming language.', '', 1),
+(2, 'what is PHP', '?\n\nPHP is a programming language that can be used to develop web applications.', '', 1),
+(3, 'what is flutter', 'flutter\n\nFlutter is a cross-platform mobile app development framework written in Dart that makes developing high-quality native apps for Android and iOS easy.', '', 1),
+(4, 'what is React js', '?\n\nReact is a JavaScript library for building user interfaces. It lets you create reusable components so that your code is easy to read and maintain.', '', 1),
+(5, 'what is coding', 'Coding is a process of transforming computer instructions into a form a computer can understand. Programs are written in a particular language which provides a structure for the programmer and uses specific instructions to control the sequence of operations that the computer carries out. The', '', 1),
+(6, 'HTML stands for', 'Hypertext Markup Language.\n\nHTML is a markup language that is used to create web pages. It consists of a series of elements that are used to structure the content of a web page. These elements are typically represented by tags.', '', 2),
+(8, 'what is flutter', 'Flutter is a cross-platform mobile app development framework that allows developers to create native-looking apps for both Android and iOS. Flutter uses a single codebase, meaning that developers can create an app for both platforms using the same code', '', 2);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `chatgptapp_tbl_user`
+--
+
+CREATE TABLE `chatgptapp_tbl_user` (
+  `id` bigint(20) NOT NULL,
+  `username` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password` varchar(100) NOT NULL,
+  `status` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `chatgptapp_tbl_user`
+--
+
+INSERT INTO `chatgptapp_tbl_user` (`id`, `username`, `email`, `password`, `status`) VALUES
+(1, 'liyat', 'liyat@gmail.com', '123', ''),
+(2, 'gopika', 'gopika@gmail.com', '123', '');
 
 -- --------------------------------------------------------
 
@@ -215,8 +226,8 @@ INSERT INTO `django_content_type` (`id`, `app_label`, `model`) VALUES
 (3, 'auth', 'group'),
 (2, 'auth', 'permission'),
 (4, 'auth', 'user'),
-(8, 'chatgptapp', 'chatlog'),
-(7, 'chatgptapp', 'tbl_questionanswer'),
+(8, 'chatgptapp', 'tbl_questionanswer'),
+(7, 'chatgptapp', 'tbl_user'),
 (5, 'contenttypes', 'contenttype'),
 (6, 'sessions', 'session');
 
@@ -238,27 +249,25 @@ CREATE TABLE `django_migrations` (
 --
 
 INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES
-(1, 'contenttypes', '0001_initial', '2023-08-31 08:59:59.927792'),
-(2, 'auth', '0001_initial', '2023-08-31 09:00:00.460688'),
-(3, 'admin', '0001_initial', '2023-08-31 09:00:00.581014'),
-(4, 'admin', '0002_logentry_remove_auto_add', '2023-08-31 09:00:00.596645'),
-(5, 'admin', '0003_logentry_add_action_flag_choices', '2023-08-31 09:00:00.596645'),
-(6, 'contenttypes', '0002_remove_content_type_name', '2023-08-31 09:00:00.676016'),
-(7, 'auth', '0002_alter_permission_name_max_length', '2023-08-31 09:00:00.832775'),
-(8, 'auth', '0003_alter_user_email_max_length', '2023-08-31 09:00:00.848402'),
-(9, 'auth', '0004_alter_user_username_opts', '2023-08-31 09:00:00.864423'),
-(10, 'auth', '0005_alter_user_last_login_null', '2023-08-31 09:00:00.926934'),
-(11, 'auth', '0006_require_contenttypes_0002', '2023-08-31 09:00:00.926934'),
-(12, 'auth', '0007_alter_validators_add_error_messages', '2023-08-31 09:00:00.942562'),
-(13, 'auth', '0008_alter_user_username_max_length', '2023-08-31 09:00:00.961688'),
-(14, 'auth', '0009_alter_user_last_name_max_length', '2023-08-31 09:00:00.989887'),
-(15, 'auth', '0010_alter_group_name_max_length', '2023-08-31 09:00:01.021131'),
-(16, 'auth', '0011_update_proxy_permissions', '2023-08-31 09:00:01.036793'),
-(17, 'auth', '0012_alter_user_first_name_max_length', '2023-08-31 09:00:01.052414'),
-(18, 'chatgptapp', '0001_initial', '2023-08-31 09:00:01.068548'),
-(19, 'sessions', '0001_initial', '2023-08-31 09:00:01.099811'),
-(20, 'chatgptapp', '0002_chatlog', '2023-09-01 04:52:36.093503'),
-(21, 'chatgptapp', '0003_alter_tbl_questionanswer_answer', '2023-09-01 11:40:25.217084');
+(1, 'contenttypes', '0001_initial', '2023-09-04 07:51:02.857062'),
+(2, 'auth', '0001_initial', '2023-09-04 07:51:03.367761'),
+(3, 'admin', '0001_initial', '2023-09-04 07:51:03.493164'),
+(4, 'admin', '0002_logentry_remove_auto_add', '2023-09-04 07:51:03.500675'),
+(5, 'admin', '0003_logentry_add_action_flag_choices', '2023-09-04 07:51:03.509184'),
+(6, 'contenttypes', '0002_remove_content_type_name', '2023-09-04 07:51:03.571696'),
+(7, 'auth', '0002_alter_permission_name_max_length', '2023-09-04 07:51:03.619002'),
+(8, 'auth', '0003_alter_user_email_max_length', '2023-09-04 07:51:03.650261'),
+(9, 'auth', '0004_alter_user_username_opts', '2023-09-04 07:51:03.650261'),
+(10, 'auth', '0005_alter_user_last_login_null', '2023-09-04 07:51:03.701135'),
+(11, 'auth', '0006_require_contenttypes_0002', '2023-09-04 07:51:03.701135'),
+(12, 'auth', '0007_alter_validators_add_error_messages', '2023-09-04 07:51:03.713148'),
+(13, 'auth', '0008_alter_user_username_max_length', '2023-09-04 07:51:03.728797'),
+(14, 'auth', '0009_alter_user_last_name_max_length', '2023-09-04 07:51:03.760048'),
+(15, 'auth', '0010_alter_group_name_max_length', '2023-09-04 07:51:03.775663'),
+(16, 'auth', '0011_update_proxy_permissions', '2023-09-04 07:51:03.791288'),
+(17, 'auth', '0012_alter_user_first_name_max_length', '2023-09-04 07:51:03.807308'),
+(18, 'chatgptapp', '0001_initial', '2023-09-04 07:51:03.964001'),
+(19, 'sessions', '0001_initial', '2023-09-04 07:51:04.001762');
 
 -- --------------------------------------------------------
 
@@ -271,6 +280,14 @@ CREATE TABLE `django_session` (
   `session_data` longtext NOT NULL,
   `expire_date` datetime(6) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `django_session`
+--
+
+INSERT INTO `django_session` (`session_key`, `session_data`, `expire_date`) VALUES
+('hil9yk1mq6929mfkk1hhr4d7ofj424ae', 'e30:1qdNWX:i3FCc5bUUcQFGB4oFcxx6gEztFA8scZEFPgQRHl9LHM', '2023-09-19 04:18:45.383237'),
+('jiv10vwcde5yu0o8x8ilh2ozmmy4t7dj', 'eyJpZCI6MX0:1qd4SG:rkEUo8eEQgZcwHlvy2qzIYAy8wiuQP0cD_s_ahiOeMo', '2023-09-18 07:57:04.543108');
 
 --
 -- Indexes for dumped tables
@@ -322,15 +339,16 @@ ALTER TABLE `auth_user_user_permissions`
   ADD KEY `auth_user_user_permi_permission_id_1fbb5f2c_fk_auth_perm` (`permission_id`);
 
 --
--- Indexes for table `chatgptapp_chatlog`
---
-ALTER TABLE `chatgptapp_chatlog`
-  ADD PRIMARY KEY (`id`);
-
---
 -- Indexes for table `chatgptapp_tbl_questionanswer`
 --
 ALTER TABLE `chatgptapp_tbl_questionanswer`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `chatgptapp_tbl_quest_user_id_9c4f25eb_fk_chatgptap` (`user_id`);
+
+--
+-- Indexes for table `chatgptapp_tbl_user`
+--
+ALTER TABLE `chatgptapp_tbl_user`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -402,16 +420,16 @@ ALTER TABLE `auth_user_user_permissions`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `chatgptapp_chatlog`
---
-ALTER TABLE `chatgptapp_chatlog`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `chatgptapp_tbl_questionanswer`
 --
 ALTER TABLE `chatgptapp_tbl_questionanswer`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `chatgptapp_tbl_user`
+--
+ALTER TABLE `chatgptapp_tbl_user`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `django_admin_log`
@@ -429,7 +447,7 @@ ALTER TABLE `django_content_type`
 -- AUTO_INCREMENT for table `django_migrations`
 --
 ALTER TABLE `django_migrations`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- Constraints for dumped tables
@@ -461,6 +479,12 @@ ALTER TABLE `auth_user_groups`
 ALTER TABLE `auth_user_user_permissions`
   ADD CONSTRAINT `auth_user_user_permi_permission_id_1fbb5f2c_fk_auth_perm` FOREIGN KEY (`permission_id`) REFERENCES `auth_permission` (`id`),
   ADD CONSTRAINT `auth_user_user_permissions_user_id_a95ead1b_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`);
+
+--
+-- Constraints for table `chatgptapp_tbl_questionanswer`
+--
+ALTER TABLE `chatgptapp_tbl_questionanswer`
+  ADD CONSTRAINT `chatgptapp_tbl_quest_user_id_9c4f25eb_fk_chatgptap` FOREIGN KEY (`user_id`) REFERENCES `chatgptapp_tbl_user` (`id`);
 
 --
 -- Constraints for table `django_admin_log`
