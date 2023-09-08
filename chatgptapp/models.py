@@ -9,13 +9,9 @@ class Tbl_User(models.Model):
     status = models.CharField(max_length=100)
 
 class Tbl_QuestionAnswer(models.Model):
-    question = models.CharField(max_length=100,default='')
-    answer = models.CharField(max_length=800,default='')
-    status = models.CharField(max_length=100,default='')
+    question = models.TextField()
+    answer = models.TextField()
     user=models.ForeignKey(Tbl_User,on_delete=models.CASCADE,default='')
-
-# class ChatLog(models.Model):
-#     user_message = models.TextField()
-#     bot_response = models.TextField()
-#     timestamp = models.DateTimeField(auto_now_add=True)
-
+    timestamp = models.DateTimeField(auto_now_add=True) 
+    def __str__(self):
+        return f"Question: {self.question}, Answer: {self.answer}"
