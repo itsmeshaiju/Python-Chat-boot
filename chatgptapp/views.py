@@ -17,21 +17,18 @@ config.read('config.ini')
 
 # Create your views here.
 
-def index(request):
-    return render(request,'index.html')
-
 def generate_content(request):
     if request.method == 'POST':
         try:
             question = request.POST.get('question')
 
             # Generate an answer from ChatGPT (you can keep this part)
-            api_key = "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"  # Replace with your actual API key
+            api_key = "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"  # Replace with your actual API key
             openai.api_key = api_key
             answer_response = openai.Completion.create(
                 model="text-davinci-003",
                 prompt=question,
-                max_tokens=50,
+                max_tokens=2000,
                 temperature=0.7,
             )
             answer = answer_response["choices"][0]["text"].strip()
@@ -44,20 +41,17 @@ def generate_content(request):
 
         except Exception as e:
             return render(request, 'index.html', {'error_message': str(e)})
+
     # Retrieve questions and answers for the current user
     user_id = request.session.get('id')
     question_answers = Tbl_QuestionAnswer.objects.filter(user__id=user_id)
     question_list = Tbl_QuestionAnswer.objects.filter(user_id=user_id).order_by('-timestamp')
-
-    return render(request, 'index.html', {'question_answers': question_answers, 'question_list':question_list,'user_id':user_id})
-
-def download_as_pdf(request):
-    ii = request.GET['id']
-    var = Tbl_QuestionAnswer.objects.all().filter(user=ii)
-    pdf = render_to_pdf('pdf.html', {'var': var})
-    response = HttpResponse(pdf, content_type="application/pdf")
-    response['Content-Disposition'] = 'attachment; filename=QuestionAnswer.pdf'
-    return response
+    paginator = Paginator(question_list, 8)
+    page_number = request.GET.get("page")
+    question_list = paginator.get_page(page_number)
+    user_data = request.session.get('id')
+    user = Tbl_User.objects.filter(id=user_data)
+    return render(request, 'index.html', {'question_answers': question_answers, 'question_list':question_list, 'user':user,'user_id':user_id})
 
 def signup(request):
     if request.method == "POST":
@@ -73,6 +67,7 @@ def signup(request):
         user.save()
         messages.success(request, 'Success! Signup Completed...')
         return redirect('login')
+
     return render(request, 'signup.html')
 
 def login(request):
@@ -84,6 +79,7 @@ def login(request):
             user = Tbl_User.objects.get(username=username, password=password)
         except Tbl_User.DoesNotExist:
             user = None
+
         if user is not None:
             request.session['id'] = user.id
             # messages.success(request, 'Login Successfully...')
@@ -91,6 +87,7 @@ def login(request):
         else:
             messages.error(request, 'Invalid Credentials...')
             return redirect('login')
+
     return render(request, 'login.html')
 
 
@@ -99,3 +96,20 @@ def logout(request):
         del request.session['id']
         logout(request)
     return HttpResponseRedirect('/')
+
+def download_as_pdf(request):
+    user_id = request.GET['id']
+    var = Tbl_QuestionAnswer.objects.all().filter(user=user_id)
+    user = Tbl_User.objects.filter(id=user_id).first()  # Get the user object
+    if user:
+        # Create a filename with the username
+        filename = f"{user.username}.pdf"
+        pdf = render_to_pdf('pdf.html', {'var': var, 'user': user})
+        
+        # Set the Content-Disposition header with the dynamic filename
+        response = HttpResponse(pdf, content_type="application/pdf")
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+    else:
+        # Handle the case when the user with the given ID is not found
+        return HttpResponse("User not found", status=404)

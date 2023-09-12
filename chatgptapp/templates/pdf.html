@@ -57,8 +57,7 @@
          <h3 style="font-size: 25px;"><center>Question Answers</center></h3>
            <p>
                {% for x in var %}
-               {{user.username}}
-
+               
                {{forloop.counter}}. Question: {{x.question}}
                <br>
                Answer: {{x.answer}}
