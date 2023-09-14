@@ -16,7 +16,7 @@ def generate_content(request):
             print('Generating content', question)
 
             # Generate an answer from ChatGPT
-            api_key = "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"  # Replace with your OpenAI API key
+            api_key = ""  # Replace with your OpenAI API key
             openai.api_key = api_key
 
             answer_response = openai.Completion.create(
