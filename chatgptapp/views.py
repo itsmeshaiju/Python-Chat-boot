@@ -13,8 +13,6 @@ def generate_content(request):
     if request.method == 'POST':
         try:
             question = request.POST.get('question')
-            print('Generating content', question)
-
             # Generate an answer from ChatGPT
             api_key = ""  # Replace with your OpenAI API key
             openai.api_key = api_key
