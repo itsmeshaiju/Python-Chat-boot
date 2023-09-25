@@ -1,0 +1,41 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# IDE-specific files
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Database
+*.sqlite3
+db.sqlite3
+
+
+
+# Temporary files
+*.swp
+*.swo
+
+# Compiled Python files
+*.pyc
+
+# Configuration files
+*.ini
+
+# Secret key
+secret_key.py
+
+# .env file (for environment variables)
+.env
+
+# Ignore migrations (uncomment this if you use South or other migration tools)
+# /migrations/
