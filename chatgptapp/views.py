@@ -6,6 +6,7 @@ from django.shortcuts import redirect, render
 
 from chatgpt.utils import render_to_pdf
 from .models import *
+import chatgptapp.secret_key as secret_key
 
 
 @login_required
@@ -14,11 +15,11 @@ def generate_content(request):
         try:
             question = request.POST.get('question')
             # Generate an answer from ChatGPT
-            api_key = ""  # Replace with your OpenAI API key
+            api_key = secret_key
             openai.api_key = api_key
 
             answer_response = openai.Completion.create(
-                engine="text-davinci-002",
+                engine="text-davinci-003",
                 prompt=question,
                 max_tokens=2000,
                 temperature=0.7,
@@ -74,3 +75,12 @@ def download_as_pdf(request):
     else:
         # Handle the case when the user is not authenticated
         return HttpResponse("User not authenticated", status=401)
+#delete question list
+@login_required
+def delete_question(request, question_id):
+    try:
+        question = QuestionAnswer.objects.get(id=question_id)
+        question.delete()
+    except QuestionAnswer.DoesNotExist:
+        pass
+    return redirect('/')
