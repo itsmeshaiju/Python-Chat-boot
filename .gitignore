@@ -7,6 +7,7 @@ __pycache__/
 venv/
 env/
 ENV/
+myenv
 
 # IDE-specific files
 .vscode/
@@ -32,7 +33,7 @@ db.sqlite3
 *.ini
 
 # Secret key
-secret_key.py
+config.py
 
 # .env file (for environment variables)
 .env
@@ -40,3 +41,6 @@ secret_key.py
 # Ignore migrations (uncomment this if you use South or other migration tools)
 # /migrations/
 .idea/workspace.xml
+
+.pyc
+__pycache__

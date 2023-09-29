@@ -3,10 +3,9 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
-
+import config
 from chatgpt.utils import render_to_pdf
 from .models import *
-import chatgptapp.secret_key as secret_key
 
 
 @login_required
@@ -15,7 +14,7 @@ def generate_content(request):
         try:
             question = request.POST.get('question')
             # Generate an answer from ChatGPT
-            api_key = secret_key
+            api_key = config.Api_key
             openai.api_key = api_key
 
             answer_response = openai.Completion.create(
